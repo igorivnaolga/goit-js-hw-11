@@ -1,3 +1,7 @@
+.container {
+  margin: 10px;
+}
+
 img {
   display: block;
   object-fit: cover;
@@ -5,7 +9,7 @@ img {
 
 a {
   text-decoration: none;
-  color: black;
+  color: rgb(51, 50, 50);
 }
 
 p {
@@ -15,24 +19,26 @@ p {
 body {
   margin-top: 0;
   font-family: 'Google Sans', Roboto, Arial, sans-serif;
-  background-color: white;
-  color: black;
+  background-color: rgb(254, 251, 251);
+  color: rgb(51, 50, 50);
 }
 
 #search-form {
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   font: inherit;
-  padding: 8px;
+  padding: 40px 120px;
   width: 100%;
   position: fixed;
-  gap: 10px;
+  gap: 30px;
   z-index: 100;
 }
 .input {
-  font-size: 24px;
+  font-size: 18px;
   height: 48px;
   padding: 10px;
+  margin-bottom: 30px;
   border-radius: 24px;
   border-style: none;
   align-items: center;
@@ -43,7 +49,7 @@ body {
   cursor: pointer;
   display: block;
   width: 100%;
-  max-width: 500px;
+  min-width: 150px;
 
   padding: 16px 18px;
   transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -55,18 +61,14 @@ body {
   background-color: #f3f5f7;
 }
 
-.load-more {
-  display: block;
-  margin-top: 16px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 30px;
-}
-
 button.input {
   max-width: 150px;
   padding: 10px;
-  background-color: #acbed0;
+  background-color: #dee1e6;
+}
+button.load-more {
+  margin: 10px auto;
+  font-size: 18px;
 }
 
 .is-hidden {
@@ -78,20 +80,21 @@ button.input {
   justify-content: center;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 16px;
-  padding-top: 60px;
+  gap: 20px;
+  padding: 120px 8px 20px;
 }
 
-.gallery_item {
+.gallery-item {
   height: 100%;
 }
 
 .photo-card {
-  width: 350px;
+  max-width: 350px;
   height: 100%;
   padding-bottom: 10px;
-  box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.16), 0px 4px 4px rgba(0, 0, 0, 0.06),
-    0px 1px 1px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 3px 5px -1px,
+    rgba(0, 0, 0, 0.14) 0 6px 10px 0, rgba(0, 0, 0, 0.12) 0 1px 18px 0;
   transform: scale(1);
   transition: transform 0.3s;
 }
@@ -100,18 +103,44 @@ button.input {
   transform: scale(1.03);
 }
 
-.gallery_img {
+.photo-img {
   height: 200px;
   width: 100%;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .info {
+  font-size: 16px;
+  color: #747676;
   display: flex;
-  justify-content: space-around;
-  margin-top: 8px;
-}
 
-.info-item {
-  display: flex;
-  flex-direction: column;
+  gap: 10px;
+
+  margin: 8px;
+}
+@media only screen and (max-width: 767px) {
+  #search-form {
+    padding: 20px 120px;
+    gap: 10px;
+  }
+  .gallery {
+    padding: 80px 10px 20px;
+  }
+
+  .input {
+    width: 100%;
+    font-size: 14px;
+    height: 36px;
+  }
+  .info {
+    font-size: 12px;
+  }
+  button.input {
+    min-width: 100px;
+    width: 100%;
+  }
+  button.load-more {
+    font-size: 14px;
+  }
 }

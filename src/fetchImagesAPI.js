@@ -7,5 +7,6 @@ const pageSize = 40;
 export async function fetchImages(inputText, page) {
   const url = `${BASE_URL}/?key=${key}&q=${inputText}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${pageSize}`;
 
-  return await axios.get(url);
+  const { data } = await axios.get(url);
+  return data;
 }

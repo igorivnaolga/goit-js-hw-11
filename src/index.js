@@ -12,7 +12,8 @@ const selectors = {
 
 let page = 1;
 let inputText = '';
-let totalHits;
+let totalHitsImages;
+let gallery = new SimpleLightbox('.gallery a');
 
 // const intersectionObserver = new IntersectionObserver(handlerObserver);
 
@@ -28,35 +29,39 @@ async function onSearchSubmit(event) {
   if (!inputText) {
     return Notiflix.Notify.failure('Please enter your query.');
   }
-  fetchImages(inputText, page)
-    .then(searchGallery)
-    .catch(error => console.log(error));
-  let lightbox = new SimpleLightbox('.gallery a');
+  try {
+    const data = await fetchImages(inputText, page);
+    searchGallery(data);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-function searchGallery(images) {
-  if (images.data.hits.length === 0) {
+function searchGallery({ hits, totalHits }) {
+  if (hits.length === 0) {
     return Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
   }
-  totalHits = images.data.total;
+  totalHitsImages = totalHits;
   selectors.buttonLoadMore.classList.remove('is-hidden');
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-  return searchGallery(images);
+  renderMarkup(hits);
+  gallery.refresh();
 }
 //кнопка LoadMore
 async function onLoadMore() {
   page += 1;
   isAllImages();
-  return await fetchImages(inputText, page)
-    .then(renderMarkup)
-    .catch(error => console.log(error));
+  try {
+    const { hits, totalHits } = await fetchImages(inputText, page);
+    renderMarkup(hits);
+  } catch (error) {
+    console.log(error);
+  }
 }
 function renderMarkup(images) {
-  const imagesArray = images.data.hits;
-  console.log(imagesArray);
-  const markup = imagesArray
+  const markup = images
     .map(
       ({
         largeImageURL,
@@ -92,13 +97,10 @@ function renderMarkup(images) {
     .join('');
 
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
-
-  let gallery = new SimpleLightbox('.gallery a');
-  gallery.refresh();
 }
 
 function isAllImages() {
-  if (page * 40 >= totalHits) {
+  if (page * 40 >= totalHitsImages) {
     selectors.buttonLoadMore.classList.add('is-hidden');
     Notify.success(
       "We're sorry, but you've reached the end of search results."

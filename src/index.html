@@ -9,20 +9,22 @@
     <script type="module" src="./index.js"></script>
   </head>
   <body>
-    <form class="search-form" id="search-form">
-      <input
-        class="input"
-        type="text"
-        name="searchQuery"
-        autocomplete="off"
-        placeholder="Search images..."
-      />
-      <button class="input" type="submit">Search</button>
-    </form>
     <div class="container">
+      <form class="search-form" id="search-form">
+        <input
+          class="input"
+          type="text"
+          name="searchQuery"
+          autocomplete="off"
+          placeholder="Search images..."
+        />
+        <button class="input" type="submit">Search</button>
+      </form>
+
       <div class="gallery"></div>
+
+      <button type="button" class="load-more button input">Load more</button>
     </div>
-    <button type="button" class="load-more button">Load more</button>
     <!-- Infinity scroll -->
     <!-- <div class="js-guard"></div> -->
     <script src="./index.js" type="module"></script>
