@@ -1,15 +1,15 @@
 export function renderMarkup(data) {
-  const {
-    webformatURL,
-    largeImageURL,
-    tags,
-    likes,
-    views,
-    comments,
-    downloads,
-  } = data;
-
-  return /*html*/ `<div class="photo-card">
+  return data
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<div class="photo-card">
     <a class="gallery__item" href='${largeImageURL}'>
     <img class=' photo gallery__image' src="${webformatURL}" alt="${tags}" loading="lazy" />
     </a> 
@@ -31,5 +31,7 @@ export function renderMarkup(data) {
                 <span>${downloads}</span>
             </p>
         </div>
-    </div>`;
+    </div>`
+    )
+    .join('');
 }
