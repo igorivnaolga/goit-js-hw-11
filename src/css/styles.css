@@ -70,7 +70,13 @@ button.load-more {
   margin: 10px auto;
   font-size: 18px;
 }
-
+button.load-more:hover,
+button.load-more:focus,
+button.input:hover,
+button.input:focus {
+  background-color: #ffffffa5;
+  transform: scale(1.03);
+}
 .is-hidden {
   display: none;
 }
@@ -111,13 +117,16 @@ button.load-more {
 }
 
 .info {
-  font-size: 16px;
+  font-size: 12px;
   color: #747676;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 
   gap: 10px;
 
-  margin: 8px;
+  margin: 10px;
 }
 @media only screen and (max-width: 767px) {
   #search-form {
@@ -134,7 +143,7 @@ button.load-more {
     height: 36px;
   }
   .info {
-    font-size: 12px;
+    font-size: 10px;
   }
   button.input {
     min-width: 100px;
