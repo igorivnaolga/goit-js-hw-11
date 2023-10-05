@@ -1,5 +1,4 @@
 import { fetchImages } from './fetchImagesAPI';
-// import { renderMarkup } from './renderMarkup';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -8,16 +7,21 @@ const selectors = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
   buttonLoadMore: document.querySelector('.load-more'),
+  endCollectionText: document.querySelector('.end-collection-text'),
 };
 
 let page = 1;
+const perPage = 40;
 let inputText = '';
-let totalHitsImages;
-let gallery = new SimpleLightbox('.gallery a');
+let gallery = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 // const intersectionObserver = new IntersectionObserver(handlerObserver);
 
-selectors.buttonLoadMore.classList.add('is-hidden');
+// selectors.buttonLoadMore.classList.add('is-hidden');
 selectors.searchForm.addEventListener('submit', onSearchSubmit);
 selectors.buttonLoadMore.addEventListener('click', onLoadMore);
 
@@ -27,6 +31,7 @@ async function onSearchSubmit(event) {
   inputText = event.target.elements.searchQuery.value.trim();
   event.target.reset();
   if (!inputText) {
+    hideLoadMoreButton();
     return Notiflix.Notify.failure('Please enter your query.');
   }
   try {
@@ -37,25 +42,36 @@ async function onSearchSubmit(event) {
   }
 }
 
-function searchGallery({ hits, totalHits }) {
+function searchGallery({ hits, totalHits, perPage }) {
+  hideLoadMoreButton();
   if (hits.length === 0) {
-    return Notiflix.Notify.failure(
+    Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+
+    return;
   }
-  totalHitsImages = totalHits;
-  selectors.buttonLoadMore.classList.remove('is-hidden');
+
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+
   renderMarkup(hits);
   gallery.refresh();
+  updateLoadMoreButton(totalHits);
 }
+
 //кнопка LoadMore
 async function onLoadMore() {
   page += 1;
-  isAllImages();
+
   try {
     const { hits, totalHits } = await fetchImages(inputText, page);
     renderMarkup(hits);
+    if (hits.length < perPage) {
+      hideLoadMoreButton();
+      return Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
   } catch (error) {
     console.log(error);
   }
@@ -78,16 +94,16 @@ function renderMarkup(images) {
                  <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
                  <div class="info">
                      <p class="info-item">
-                     <b>Likes: ${likes}</b>
+                    <b>Likes:</b>  ${likes}
                      </p>
                      <p class="info-item">
-                     <b>Views: ${views}</b>
+                    <b>Views:</b>  ${views}
                      </p>
                      <p class="info-item">
-                     <b>Comments: ${comments}</b>
+                     <b>Comments:</b> ${comments}
                      </p>
                      <p class="info-item">
-                     <b>Downloads: ${downloads}</b>
+                     <b>Downloads:</b> ${downloads}
                      </p>
                 </div>
              </div>
@@ -98,12 +114,19 @@ function renderMarkup(images) {
 
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
 }
+function updateLoadMoreButton(totalHits) {
+  const totalPages = Math.ceil(totalHits / perPage);
 
-function isAllImages() {
-  if (page * 40 >= totalHitsImages) {
-    selectors.buttonLoadMore.classList.add('is-hidden');
-    Notify.success(
-      "We're sorry, but you've reached the end of search results."
-    );
+  if (page >= totalPages) {
+    hideLoadMoreButton();
+  } else {
+    showLoadMoreButton();
   }
+}
+function showLoadMoreButton() {
+  selectors.buttonLoadMore.classList.remove('is-hidden');
+}
+
+function hideLoadMoreButton() {
+  selectors.buttonLoadMore.classList.add('is-hidden');
 }
