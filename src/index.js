@@ -55,9 +55,11 @@ async function onSearchSubmit(event) {
 
 function searchGallery({ hits, totalHits }) {
   if (hits.length === 0) {
+    hideLoadMoreButton();
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+
     return;
   }
 
@@ -121,7 +123,7 @@ function renderMarkup(images) {
 
 function updateLoadMoreButton(totalHits) {
   const totalPages = Math.ceil(totalHits / perPage);
-  if (page > totalPages) {
+  if (page === totalPages) {
     hideLoadMoreButton();
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results."
