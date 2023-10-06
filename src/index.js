@@ -32,23 +32,32 @@ async function onSearchSubmit(event) {
   event.target.reset();
   if (!inputText) {
     hideLoadMoreButton();
-    return Notiflix.Notify.failure('Please enter your query.');
+    Notiflix.Notify.failure('Please enter your query.');
+    return;
   }
   try {
     const data = await fetchImages(inputText, page);
     searchGallery(data);
+
+    updateLoadMoreButton(data.totalHits);
+    // const totalPages = Math.ceil(data.totalHits / perPage);
+
+    // if (page >= totalPages) {
+    //   hideLoadMoreButton();
+    //   Notiflix.Notify.info(
+    //     "We're sorry, but you've reached the end of search results."
+    //   );
+    // }
   } catch (error) {
     console.log(error);
   }
 }
 
-function searchGallery({ hits, totalHits, perPage }) {
-  hideLoadMoreButton();
+function searchGallery({ hits, totalHits }) {
   if (hits.length === 0) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-
     return;
   }
 
@@ -56,7 +65,7 @@ function searchGallery({ hits, totalHits, perPage }) {
 
   renderMarkup(hits);
   gallery.refresh();
-  updateLoadMoreButton(totalHits);
+  // updateLoadMoreButton(totalHits);
 }
 
 //кнопка LoadMore
@@ -66,12 +75,7 @@ async function onLoadMore() {
   try {
     const { hits, totalHits } = await fetchImages(inputText, page);
     renderMarkup(hits);
-    if (hits.length < perPage) {
-      hideLoadMoreButton();
-      return Notiflix.Notify.info(
-        "We're sorry, but you've reached the end of search results."
-      );
-    }
+    updateLoadMoreButton(totalHits);
   } catch (error) {
     console.log(error);
   }
@@ -114,11 +118,14 @@ function renderMarkup(images) {
 
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
 }
+
 function updateLoadMoreButton(totalHits) {
   const totalPages = Math.ceil(totalHits / perPage);
-
-  if (page >= totalPages) {
+  if (page > totalPages) {
     hideLoadMoreButton();
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
   } else {
     showLoadMoreButton();
   }

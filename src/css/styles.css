@@ -129,6 +129,8 @@ button.input:focus {
   margin: 10px;
 }
 
+/* To-top-button */
+
 @media only screen and (max-width: 767px) {
   #search-form {
     padding: 20px 120px;
