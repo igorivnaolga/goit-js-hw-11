@@ -12,6 +12,7 @@ const selectors = {
 
 let page = 1;
 const perPage = 40;
+
 let inputText = '';
 let gallery = new SimpleLightbox('.gallery a', {
   captions: true,
@@ -27,6 +28,7 @@ selectors.buttonLoadMore.addEventListener('click', onLoadMore);
 
 async function onSearchSubmit(event) {
   event.preventDefault();
+  page = 1;
   selectors.gallery.innerHTML = '';
   inputText = event.target.elements.searchQuery.value.trim();
   event.target.reset();
@@ -37,25 +39,28 @@ async function onSearchSubmit(event) {
   }
   try {
     const data = await fetchImages(inputText, page);
+
     searchGallery(data);
 
-    updateLoadMoreButton(data.totalHits);
-    // const totalPages = Math.ceil(data.totalHits / perPage);
+    // updateLoadMoreButton(data.totalHits);
+    const totalPages = Math.ceil(data.totalHits / perPage);
 
-    // if (page >= totalPages) {
-    //   hideLoadMoreButton();
-    //   Notiflix.Notify.info(
-    //     "We're sorry, but you've reached the end of search results."
-    //   );
-    // }
+    if (page === totalPages) {
+      hideLoadMoreButton();
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+    }
   } catch (error) {
     console.log(error);
   }
+  console.log(page);
 }
 
 function searchGallery({ hits, totalHits }) {
   if (hits.length === 0) {
     hideLoadMoreButton();
+
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
@@ -66,8 +71,9 @@ function searchGallery({ hits, totalHits }) {
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 
   renderMarkup(hits);
+
   gallery.refresh();
-  // updateLoadMoreButton(totalHits);
+  showLoadMoreButton();
 }
 
 //кнопка LoadMore
@@ -76,8 +82,16 @@ async function onLoadMore() {
 
   try {
     const { hits, totalHits } = await fetchImages(inputText, page);
+
     renderMarkup(hits);
-    updateLoadMoreButton(totalHits);
+    const totalPages = Math.ceil(totalHits / perPage);
+    if (page === totalPages) {
+      hideLoadMoreButton();
+      Notiflix.Notify.info(
+        "We're sorry, but you've reached the end of search results."
+      );
+      return;
+    }
   } catch (error) {
     console.log(error);
   }
@@ -121,17 +135,19 @@ function renderMarkup(images) {
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
 }
 
-function updateLoadMoreButton(totalHits) {
-  const totalPages = Math.ceil(totalHits / perPage);
-  if (page === totalPages) {
-    hideLoadMoreButton();
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
-    );
-  } else {
-    showLoadMoreButton();
-  }
-}
+// function updateLoadMoreButton(totalHits) {
+//   const totalPages = Math.ceil(totalHits / perPage);
+//   console.log(totalPages);
+//   console.log(page);
+//   if (page === totalPages) {
+//     hideLoadMoreButton();
+//     Notiflix.Notify.info(
+//       "We're sorry, but you've reached the end of search results."
+//     );
+//   } else {
+//     showLoadMoreButton();
+//   }
+// }
 function showLoadMoreButton() {
   selectors.buttonLoadMore.classList.remove('is-hidden');
 }
