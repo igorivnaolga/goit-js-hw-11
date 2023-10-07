@@ -7,7 +7,7 @@ const selectors = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
   buttonLoadMore: document.querySelector('.load-more'),
-  endCollectionText: document.querySelector('.end-collection-text'),
+  // jsGuard: document.querySelector('.js-guard'),
 };
 
 let page = 1;
@@ -54,7 +54,6 @@ async function onSearchSubmit(event) {
   } catch (error) {
     console.log(error);
   }
-  console.log(page);
 }
 
 function searchGallery({ hits, totalHits }) {
@@ -133,6 +132,7 @@ function renderMarkup(images) {
     .join('');
 
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
+  // observer.observe(selectors.jsGuard);
 }
 
 // function updateLoadMoreButton(totalHits) {
@@ -155,3 +155,18 @@ function showLoadMoreButton() {
 function hideLoadMoreButton() {
   selectors.buttonLoadMore.classList.add('is-hidden');
 }
+
+// function handlerObserver(entries) {
+//   entries.forEach(entry => {
+//     if (entry.isIntersecting) {
+//       console.log('ELEMENT WAS INTERSECTED');
+
+// page += 1;
+
+// serviceMovie(page).then(result => {
+//   const markup = createMarkup(result.results);
+//   selectors.container.insertAdjacentHTML('beforeend', markup);
+// });
+//     }
+//   });
+// }
