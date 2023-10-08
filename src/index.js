@@ -11,14 +11,9 @@ const selectors = {
 };
 
 let page = 1;
-const perPage = 40;
 
+// const perPage = 40;
 let inputText = '';
-let gallery = new SimpleLightbox('.gallery a', {
-  captions: true,
-  captionsData: 'alt',
-  captionDelay: 250,
-});
 
 // const intersectionObserver = new IntersectionObserver(handlerObserver);
 
@@ -43,7 +38,7 @@ async function onSearchSubmit(event) {
     searchGallery(data);
 
     // updateLoadMoreButton(data.totalHits);
-    const totalPages = Math.ceil(data.totalHits / perPage);
+    const totalPages = Math.ceil(data.totalHits / 40);
 
     if (page === totalPages) {
       hideLoadMoreButton();
@@ -71,8 +66,8 @@ function searchGallery({ hits, totalHits }) {
 
   renderMarkup(hits);
 
-  gallery.refresh();
   showLoadMoreButton();
+  // gallery.refresh();
 }
 
 //кнопка LoadMore
@@ -83,7 +78,9 @@ async function onLoadMore() {
     const { hits, totalHits } = await fetchImages(inputText, page);
 
     renderMarkup(hits);
-    const totalPages = Math.ceil(totalHits / perPage);
+    // gallery.refresh();
+
+    const totalPages = Math.ceil(totalHits / 40);
     if (page === totalPages) {
       hideLoadMoreButton();
       Notiflix.Notify.info(
@@ -132,6 +129,13 @@ function renderMarkup(images) {
     .join('');
 
   selectors.gallery.insertAdjacentHTML('beforeend', markup);
+
+  let gallery = new SimpleLightbox('.gallery a', {
+    captions: true,
+    captionsData: 'alt',
+    captionDelay: 250,
+  });
+
   // observer.observe(selectors.jsGuard);
 }
 
