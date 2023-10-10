@@ -2,24 +2,37 @@ import { fetchImages } from './fetchImagesAPI';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import OnlyScrollbar from 'only-scrollbar';
 
 const selectors = {
   searchForm: document.querySelector('.search-form'),
   gallery: document.querySelector('.gallery'),
-  buttonLoadMore: document.querySelector('.load-more'),
-  // jsGuard: document.querySelector('.js-guard'),
+  // buttonLoadMore: document.querySelector('.load-more'),
+  jsGuard: document.querySelector('.js-guard'),
 };
 
 let page = 1;
 
 // const perPage = 40;
 let inputText = '';
+let options = {
+  root: null,
+  rootMargin: '700px',
+  threshold: 1.0,
+};
 
-// const intersectionObserver = new IntersectionObserver(handlerObserver);
+const observer = new IntersectionObserver(onLoadMore, options);
+const scroll = new OnlyScrollbar(
+  document.querySelector('.container', {
+    damping: 0.7,
+    eventContainer: window,
+    mode: 'free',
+  })
+);
 
 // selectors.buttonLoadMore.classList.add('is-hidden');
 selectors.searchForm.addEventListener('submit', onSearchSubmit);
-selectors.buttonLoadMore.addEventListener('click', onLoadMore);
+// selectors.buttonLoadMore.addEventListener('click', onLoadMore);
 
 async function onSearchSubmit(event) {
   event.preventDefault();
@@ -28,7 +41,7 @@ async function onSearchSubmit(event) {
   inputText = event.target.elements.searchQuery.value.trim();
   event.target.reset();
   if (!inputText) {
-    hideLoadMoreButton();
+    // hideLoadMoreButton();
     Notiflix.Notify.failure('Please enter your query.');
     return;
   }
@@ -41,7 +54,8 @@ async function onSearchSubmit(event) {
     const totalPages = Math.ceil(data.totalHits / 40);
 
     if (page === totalPages) {
-      hideLoadMoreButton();
+      // hideLoadMoreButton();
+      observer.unobserve(selectors.jsGuard);
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
@@ -53,7 +67,7 @@ async function onSearchSubmit(event) {
 
 function searchGallery({ hits, totalHits }) {
   if (hits.length === 0) {
-    hideLoadMoreButton();
+    // hideLoadMoreButton();
 
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
@@ -65,33 +79,82 @@ function searchGallery({ hits, totalHits }) {
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 
   renderMarkup(hits);
-
-  showLoadMoreButton();
+  observer.observe(selectors.jsGuard);
+  // showLoadMoreButton();
   // gallery.refresh();
 }
 
 //кнопка LoadMore
-async function onLoadMore() {
-  page += 1;
+// async function onLoadMore() {
+//   page += 1;
 
-  try {
-    const { hits, totalHits } = await fetchImages(inputText, page);
+//   try {
+//     const { hits, totalHits } = await fetchImages(inputText, page);
 
-    renderMarkup(hits);
-    // gallery.refresh();
+//     renderMarkup(hits);
+//     // gallery.refresh();
 
-    const totalPages = Math.ceil(totalHits / 40);
-    if (page === totalPages) {
-      hideLoadMoreButton();
-      Notiflix.Notify.info(
-        "We're sorry, but you've reached the end of search results."
-      );
-      return;
+//     const totalPages = Math.ceil(totalHits / 40);
+//     if (page === totalPages) {
+//       hideLoadMoreButton();
+//       Notiflix.Notify.info(
+//         "We're sorry, but you've reached the end of search results."
+//       );
+//       return;
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+// async function onLoadMore(entries, observer) {
+//   entries.forEach(entry => {
+//     if (entry.isIntersecting) {
+//       try {
+//         page += 1;
+//         const { hits, totalHits } = fetchImages(inputText, page);
+//         renderMarkup(hits);
+//         // gallery.refresh();
+
+//         const totalPages = Math.ceil(totalHits / 40);
+//         if (page === totalPages) {
+//           // hideLoadMoreButton();
+//           observer.unobserve(selectors.jsGuard);
+//           Notiflix.Notify.info(
+//             "We're sorry, but you've reached the end of search results."
+//           );
+//           return;
+//         }
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     }
+//   });
+// }
+
+async function onLoadMore(entries, observer) {
+  entries.forEach(async entry => {
+    if (entry.isIntersecting) {
+      try {
+        page += 1;
+        const { hits, totalHits } = await fetchImages(inputText, page);
+        renderMarkup(hits);
+
+        const totalPages = Math.ceil(totalHits / 40);
+        if (page === totalPages) {
+          observer.unobserve(selectors.jsGuard);
+          Notiflix.Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+          return;
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
-  } catch (error) {
-    console.log(error);
-  }
+  });
 }
+
 function renderMarkup(images) {
   const markup = images
     .map(
@@ -135,8 +198,6 @@ function renderMarkup(images) {
     captionsData: 'alt',
     captionDelay: 250,
   });
-
-  // observer.observe(selectors.jsGuard);
 }
 
 // function updateLoadMoreButton(totalHits) {
@@ -152,25 +213,10 @@ function renderMarkup(images) {
 //     showLoadMoreButton();
 //   }
 // }
-function showLoadMoreButton() {
-  selectors.buttonLoadMore.classList.remove('is-hidden');
-}
+// function showLoadMoreButton() {
+//   selectors.buttonLoadMore.classList.remove('is-hidden');
+// }
 
-function hideLoadMoreButton() {
-  selectors.buttonLoadMore.classList.add('is-hidden');
-}
-
-// function handlerObserver(entries) {
-//   entries.forEach(entry => {
-//     if (entry.isIntersecting) {
-//       console.log('ELEMENT WAS INTERSECTED');
-
-// page += 1;
-
-// serviceMovie(page).then(result => {
-//   const markup = createMarkup(result.results);
-//   selectors.container.insertAdjacentHTML('beforeend', markup);
-// });
-//     }
-//   });
+// function hideLoadMoreButton() {
+//   selectors.buttonLoadMore.classList.add('is-hidden');
 // }
