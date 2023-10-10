@@ -130,6 +130,28 @@ button.input:focus {
 }
 
 /* To-top-button */
+.go-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  cursor: pointer;
+  display: none;
+  font-size: 20px;
+  color: rgba(0, 51, 153, 0.5);
+  border: 1px solid rgba(0, 51, 153, 0.5);
+  background-color: #fff;
+  padding: 15px 10px;
+}
+
+.go-top:hover {
+  color: rgba(0, 51, 153, 0.8);
+  border: 1px solid rgba(0, 51, 153, 0.8);
+  background-color: rgba(0, 51, 153, 0.15);
+}
+
+.go-top--show {
+  display: block;
+}
 
 @media only screen and (max-width: 767px) {
   #search-form {
